@@ -14,8 +14,7 @@ filepaths = glob.glob("invoices/*.xlsx")
 # A For-Loop to eterate into each filepath
 for filepath in filepaths:
 
-
-    #Create the PDF
+    # Create the PDF
     pdf = FPDF(orientation="P", unit="mm", format="A4")
     pdf.add_page()
 
@@ -26,27 +25,27 @@ for filepath in filepaths:
     invoice_nr = filename.split("-")[0]
     date = filename.split("-")[1]
 
-    #Font and size of the Cell
+    # Font and size of the Cell
     pdf.set_font(family="Times", size=16, style="B")
 
     # Invoice Nr will be printed as the first cell of the PDF document
     pdf.cell(w=50, h=8, txt=f"Invoice nr. {invoice_nr}")
 
-    #New line on the PDF file
+    # New line on the PDF file
     pdf.ln()
 
-    #Inserting the date from the file name
+    # Inserting the date from the file name
     pdf.set_font(family="Times", size=16, style="B")
-    pdf.cell(w=50, h=8, txt=f"Date: {date}",ln=1)
+    pdf.cell(w=50, h=8, txt=f"Date: {date}", ln=1)
 
-    #Add 10mm of space
+    # Add 10mm of space
     pdf.ln(10)
-    #Read the dataframe
+    # Read the dataframe
     df = pd.read_excel(filepath, sheet_name="Sheet 1")
 
-    #Creating the header
+    # Creating the header
     columns = df.columns
-    columns = [item.replace("_"," ").title() for item in columns]
+    columns = [item.replace("_", " ").title() for item in columns]
     pdf.set_font(family="Times", style="B", size=10)
     pdf.cell(w=30, h=8, txt=columns[0], border=1)
     pdf.cell(w=60, h=8, txt=columns[1], border=1)
@@ -54,14 +53,37 @@ for filepath in filepaths:
     pdf.cell(w=30, h=8, txt=columns[3], border=1)
     pdf.cell(w=30, h=8, txt=columns[4], border=1, ln=1)
 
-    #inserting the excel line into the pdf. must be a string
+    # inserting the excel line into the pdf. must be a string
     for index, row in df.iterrows():
         pdf.set_font(family="Times", size=10)
         pdf.cell(w=30, h=8, txt=str(row["product_id"]), border=1)
         pdf.cell(w=60, h=8, txt=str(row["product_name"]), border=1)
         pdf.cell(w=40, h=8, txt=str(row["amount_purchased"]), border=1)
         pdf.cell(w=30, h=8, txt=str(row["price_per_unit"]), border=1)
-        pdf.cell(w=30, h=8, txt=str(row["total_price"]), border=1,ln=1)
+        pdf.cell(w=30, h=8, txt= "£ " + str(row["total_price"]), border=1, ln=1)
 
-    #Create the output in PDF
+    # To calculate the sum we calculate the sum of tje total price cell, we store it in a variable,
+    # We create empty columns and we populate just the last with the total.
+    # converting the sum into a string to display it
+
+    total_sum = df["total_price"].sum()
+    pdf.set_font(family="Times", style="B", size=10)
+    pdf.cell(w=30, h=8)
+    pdf.cell(w=60, h=8)
+    pdf.cell(w=40, h=8)
+    pdf.cell(w=30, h=8)
+    pdf.cell(w=30, h=8, txt=f"£ {total_sum}", border=1, ln=1)
+
+    pdf.ln(10)
+    #Add total price sentence
+    pdf.set_font(family="Times", style="B", size=12)
+    pdf.cell(w=30, h=8, txt=f"The total price is: £ {total_sum}",ln=1)
+
+    pdf.ln(10)
+
+    #Add company name and logo
+    pdf.set_font(family="Times", style="B", size=10)
+    pdf.cell(w=25, h=8, txt="HCOUNT Ltd")
+    pdf.image("pythonhow.png", w=6)
+    # Create the output in PDF
     pdf.output(f"PDFs/{filename}.pdf")
