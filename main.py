@@ -1,10 +1,10 @@
 # To manipulate Data
 import pandas as pd
-# Glob is to have all fine in one filepath list
+# Glob is to have all file in one filepath list
 import glob
 # To generate PDF
 from fpdf import FPDF
-# We use Path to extract the invoice number from the invoice name
+# We use Path to extract the invoice number from the invoice name. Separate the full path and the file name
 from pathlib import Path
 
 # To open Excel file we need to install openpyxl from Python Packages
@@ -13,8 +13,7 @@ filepaths = glob.glob("invoices/*.xlsx")
 
 # A For-Loop to eterate into each filepath
 for filepath in filepaths:
-    #Read the dataframe
-    df = pd.read_excel(filepath, sheet_name="Sheet 1")
+
 
     #Create the PDF
     pdf = FPDF(orientation="P", unit="mm", format="A4")
@@ -40,5 +39,17 @@ for filepath in filepaths:
     pdf.set_font(family="Times", size=16, style="B")
     pdf.cell(w=50, h=8, txt=f"Date: {date}")
 
+    # New line on the PDF file
+    pdf.ln(25)
+    #Read the dataframe
+    df = pd.read_excel(filepath, sheet_name="Sheet 1")
+    #inserting the excel line into the pdf. must be a string
+    for index, row in df.iterrows():
+        pdf.set_font(family="Times", size=10)
+        pdf.cell(w=30, h=8, txt=str(row["product_id"]))
+        pdf.cell(w=70, h=8, txt=str(row["product_name"]))
+        pdf.cell(w=30, h=8, txt=str(row["amount_purchased"]))
+        pdf.cell(w=70, h=8, txt=str(row["price_per_unit"]))
+        pdf.cell(w=70, h=8, txt=str(row["total_price"]))
     #Create the output in PDF
     pdf.output(f"PDFs/{filename}.pdf")
