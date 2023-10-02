@@ -37,19 +37,31 @@ for filepath in filepaths:
 
     #Inserting the date from the file name
     pdf.set_font(family="Times", size=16, style="B")
-    pdf.cell(w=50, h=8, txt=f"Date: {date}")
+    pdf.cell(w=50, h=8, txt=f"Date: {date}",ln=1)
 
-    # New line on the PDF file
-    pdf.ln(25)
+    #Add 10mm of space
+    pdf.ln(10)
     #Read the dataframe
     df = pd.read_excel(filepath, sheet_name="Sheet 1")
+
+    #Creating the header
+    columns = df.columns
+    columns = [item.replace("_"," ").title() for item in columns]
+    pdf.set_font(family="Times", style="B", size=10)
+    pdf.cell(w=30, h=8, txt=columns[0], border=1)
+    pdf.cell(w=60, h=8, txt=columns[1], border=1)
+    pdf.cell(w=40, h=8, txt=columns[2], border=1)
+    pdf.cell(w=30, h=8, txt=columns[3], border=1)
+    pdf.cell(w=30, h=8, txt=columns[4], border=1, ln=1)
+
     #inserting the excel line into the pdf. must be a string
     for index, row in df.iterrows():
         pdf.set_font(family="Times", size=10)
-        pdf.cell(w=30, h=8, txt=str(row["product_id"]))
-        pdf.cell(w=70, h=8, txt=str(row["product_name"]))
-        pdf.cell(w=30, h=8, txt=str(row["amount_purchased"]))
-        pdf.cell(w=70, h=8, txt=str(row["price_per_unit"]))
-        pdf.cell(w=70, h=8, txt=str(row["total_price"]))
+        pdf.cell(w=30, h=8, txt=str(row["product_id"]), border=1)
+        pdf.cell(w=60, h=8, txt=str(row["product_name"]), border=1)
+        pdf.cell(w=40, h=8, txt=str(row["amount_purchased"]), border=1)
+        pdf.cell(w=30, h=8, txt=str(row["price_per_unit"]), border=1)
+        pdf.cell(w=30, h=8, txt=str(row["total_price"]), border=1,ln=1)
+
     #Create the output in PDF
     pdf.output(f"PDFs/{filename}.pdf")
